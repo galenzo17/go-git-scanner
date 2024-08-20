@@ -1,0 +1,2268 @@
+
+--- 2024-08-19 22:14:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:15:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:16:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:17:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:18:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:19:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:20:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:21:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:22:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:24:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:25:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:26:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:27:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:28:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:29:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:30:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:31:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:32:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:33:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:34:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+
+
+--- 2024-08-19 22:35:00 ---
+diff --git a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+index f053c144..5d516fa2 100644
+--- a/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
++++ b/apps/api/src/providers/cobre/utils/cobre-get-response-mapper.ts
+@@ -23,8 +23,9 @@ export class CobreGetResponseMapper {
+       );
+     }
+     const noveltyDetailFirstStatus = noveltyDetails[0].status;
+-
++    this.logger.log(`Cobre status received: ${noveltyDetailFirstStatus}`);
+     const state = translateCobreStatus(noveltyDetailFirstStatus);
++    this.logger.log(`Translated Cobre state: ${state}`);
+     const message = noveltyDetails[0].description ?? '';
+ 
+     return {
+diff --git a/apps/api/src/providers/jobs/cobre-payrail.job.ts b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+new file mode 100644
+index 00000000..2e08b501
+--- /dev/null
++++ b/apps/api/src/providers/jobs/cobre-payrail.job.ts
+@@ -0,0 +1,29 @@
++import moment = require('moment');
++import { Inject, Injectable, Logger } from '@nestjs/common';
++import { LessThan } from 'typeorm';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { ProviderType } from 'src/common/enums/provider-type.enum';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++
++@Injectable()
++export class CobrePayrailJob {
++  @Inject()
++  private transferProviderService: TransferProviderService;
++
++  private readonly logger = new Logger(CobrePayrailJob.name);
++  private readonly providerType = ProviderType.Cobre;
++
++  @Cron(CronExpression.EVERY_HOUR)
++  async longTermUpdateTransactions() {
++    const oneHourAgo = moment().subtract(1, 'hour').toDate();
++    this.logger.debug(
++      `Updating ${
++        this.providerType
++      } processing transactions created before ${oneHourAgo.toISOString()}`,
++    );
++    await this.transferProviderService.getTransactionsUpdate({
++      providerType: this.providerType,
++      lookupTime: LessThan(oneHourAgo),
++    });
++  }
++}
+diff --git a/apps/api/src/providers/jobs/provider-job.module.ts b/apps/api/src/providers/jobs/provider-job.module.ts
+index 1c700d4c..57e31692 100644
+--- a/apps/api/src/providers/jobs/provider-job.module.ts
++++ b/apps/api/src/providers/jobs/provider-job.module.ts
+@@ -1,11 +1,12 @@
+ import { Module } from '@nestjs/common';
+ import { TransferProviderModule } from 'src/services/transfer-provider/transfer-provider.module';
++import { CobrePayrailJob } from './cobre-payrail.job';
+ import { MinkaProviderJob } from './minka.provider.job';
+ import { ShinkansenProviderJob } from './shinkansen.provider.job';
+ 
+ @Module({
+   imports: [TransferProviderModule],
+-  providers: [MinkaProviderJob, ShinkansenProviderJob],
+-  exports: [MinkaProviderJob, ShinkansenProviderJob],
++  providers: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
++  exports: [MinkaProviderJob, ShinkansenProviderJob, CobrePayrailJob],
+ })
+ export class ProviderJobModule {}
+diff --git a/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+new file mode 100644
+index 00000000..916f0cc3
+--- /dev/null
++++ b/apps/api/test/jobs/cobrePayrailJob.e2e-spec.ts
+@@ -0,0 +1,30 @@
++import { FindOperator, LessThan } from 'typeorm';
++import { app } from '../app.setup';
++import { TransferProviderService } from 'src/services/transfer-provider/transfer-provider.service';
++import { CobrePayrailJob } from 'src/providers/jobs/cobre-payrail.job';
++
++describe('given a CobrePayrailJob', () => {
++  let cobrePayrailJob: CobrePayrailJob;
++  let transferProviderService: TransferProviderService;
++
++  beforeAll(async () => {
++    cobrePayrailJob = app.get(CobrePayrailJob);
++    transferProviderService = app.get<TransferProviderService>(
++      TransferProviderService,
++    );
++  });
++
++  describe('when call longTermUpdateTransactions', () => {
++    it('The transferProvider Service getTransactionsUpdate method is called with providerType: cobre, lookupTime: some typeOrm FindOperator', async () => {
++      const spy = jest
++        .spyOn(transferProviderService, 'getTransactionsUpdate')
++        .mockReturnValue(Promise.resolve([]));
++      await cobrePayrailJob.longTermUpdateTransactions();
++
++      expect(spy).toHaveBeenCalledWith({
++        providerType: 'cobre',
++        lookupTime: expect.any(FindOperator<typeof LessThan>),
++      });
++    });
++  });
++});
+

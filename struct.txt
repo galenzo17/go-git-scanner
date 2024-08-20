@@ -1,0 +1,17 @@
+proyecto-git-scanner/
+├── cmd/
+│   └── git-scanner/
+│       └── main.go
+├── internal/
+│   ├── gitops/
+│   │   └── diff.go
+│   ├── fileops/
+│   │   └── file.go
+│   └── httpops/
+│       └── post.go
+├── build/
+│   └── (binarios compilados)
+├── go.mod
+├── go.sum
+├── Makefile
+└── README.md
