@@ -126,3 +126,14 @@ Además de ajustar la cuenta por defecto, se ha implementado una medida para res
 El segundo punto abarca un contexto detallado sobre las razones y motivaciones detrás de la restricción mencionada. Este aspecto incluye una explicación más profunda sobre por qué estas acciones específicas han sido restringidas, posibles riesgos o incidencias que pudieran presentarse sin esta medida de seguridad adicional, y cómo se planea supervisar y controlar este acceso restringido.
 
 Estos dos elementos son fundamentales para garantizar un correcto funcionamiento operativo en Cobre, una gestión eficiente de los recursos financieros y un alto nivel de seguridad y control sobre la información sensible que maneja la organización.
+Resumen de las actividades - 2024-08-26 22:28:23
+ **Resumen de las Actividades del Día Anterior:**
+
+**Cambiar a cuenta de ahorro por defecto en todas las transacciones de Cobre:**
+- En la plataforma de Cobre, se ha implementado un cambio para que todas las transacciones sean realizadas por defecto en una cuenta de ahorro. Este ajuste responde al uso predominante de cuentas de ahorro entre los colaboradores. El propósito es optimizar y facilitar el manejo de fondos mediante la promoción del uso de esta herramienta financiera más segura y estratégica para todos los usuarios.
+
+**Restringir Acceso a las Acciones de Exportación/Auditoría/Conciliaciones:**
+- **Contexto:** Esta medida se ha tomado con el objetivo de mejorar la seguridad y controlar accesos no autorizados o innecesarios a información sensible relacionada con operaciones de exportación, auditorías internas y conciliaciones financieras. 
+- **Alcance:** Se han restringido los permisos para acceder a estas secciones del sistema, asignando solo a aquellos roles administrativos que tienen una necesidad específica y documentada de realizar dichas acciones. Esto busca prevenir errores involuntales o intencionados en operaciones críticas y proteger la integridad de los datos financieros y operativos.
+
+Estas actividades son parte del compromiso con la seguridad, la eficiencia y el control interno en las operaciones de Cobre, asegurando que tanto los usuarios como los datos estén protegidos contra riesgos innecesarios y contribuyendo a un entorno de trabajo más seguro y efectivo.
