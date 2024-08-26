@@ -113,3 +113,16 @@ Resumen de las actividades - 2024-08-26 22:24:32
 Además, se acordó tomar medidas adicionales para restringir el acceso a las funcionalidades avanzadas como exportación, auditoría y conciliaciones. Esto se hizo con la intención de mejorar la seguridad y asegurar que solo aquellos con necesidades específicas puedan acceder a estas áreas avanzadas.
 
 Estas decisiones reflejan el compromiso continuo de Cobre para brindar un servicio eficiente, seguro y accesible tanto para los usuarios como para los administradores del sistema.
+Resumen de las actividades - 2024-08-26 22:27:32
+ El resumen de las actividades del día anterior en Cobre se centra en dos aspectos principales: el cambio de la cuenta por defecto para todas las transacciones y la restricción del acceso a determinadas acciones como exportación, auditoría y conciliaciones.
+
+**Cambio de Cuenta Por Defecto:**
+En Cobre, se ha procedido al ajuste de que todas las transacciones por defecto sean realizadas desde cuentas de ahorro en lugar de cuentas corrientes. Esta decisión responde al uso predominante y la preferencia generalizada de los colaboradores por las cuentas de ahorro para manejar sus operaciones financieras. Este cambio facilitará el manejo de fondos y asegurará que los recursos estén disponibles en momentos oportunos, ya que las cuentas de ahorro suelen tener restricciones sobre la movilidad de los fondos.
+
+**Restricción del Acceso a Acciones Específicas:**
+Además de ajustar la cuenta por defecto, se ha implementado una medida para restringir el acceso a las funciones avanzadas como exportación, auditoría y conciliaciones. Esta restricción tiene como objetivo principal asegurar la integridad y seguridad de los datos financieros, evitando que usuarios no autorizados accedan a información sensible o realicen operaciones inapropiadas.
+
+**Contexto del Segundo Aspecto:**
+El segundo punto abarca un contexto detallado sobre las razones y motivaciones detrás de la restricción mencionada. Este aspecto incluye una explicación más profunda sobre por qué estas acciones específicas han sido restringidas, posibles riesgos o incidencias que pudieran presentarse sin esta medida de seguridad adicional, y cómo se planea supervisar y controlar este acceso restringido.
+
+Estos dos elementos son fundamentales para garantizar un correcto funcionamiento operativo en Cobre, una gestión eficiente de los recursos financieros y un alto nivel de seguridad y control sobre la información sensible que maneja la organización.
