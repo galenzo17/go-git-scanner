@@ -143,3 +143,11 @@ Resumen de las actividades - 2024-08-26 23:02:17
 Además, se ha implementado una medida adicional para aumentar la seguridad y controlar el acceso a determinadas acciones sensibles dentro del área de exportación, auditoría y conciliaciones. Esta restricción tiene como objetivo prevenir errores no autorizados o intencionados que puedan afectar negativamente los procesos financieros y los datos confidenciales.
 
 Estas decisiones reflejan un enfoque proactivo de Cobre para mejorar la eficiencia operativa, proteger la información sensible y satisfacer las necesidades específicas tanto de sus clientes como del equipo interno.
+Resumen de las actividades - 2024-08-27 20:26:27
+ Resumen de las actividades del día anterior:
+
+1. **Agregar una columna a la Transfer llamada "interDestinationAccount"**: Se ha realizado un ajuste para incluir una nueva columna llamada "interDestinationAccount" en la tabla de "Transfer". Este cambio tiene como objetivo mantener la consistencia y facilitar la transmisión del dato entre las entidades "transfer" y "transaction" en el sistema Payrails.
+
+2. **Recibir campo interDestinationAccount en la creación del pago**: Se ha implementado una actualización que permite recibir el campo "interDestinationAccount" durante la creación de un nuevo pago. Este ajuste tiene como propósito mejorar la precisión y flujo de datos entre las distintas partes del proceso de pago, asegurando que el dato relevante esté disponible en todas las etapas de la transacción.
+
+Estas actividades buscan mejorar la eficiencia y precisión operativa en los procesos relacionados con las transacciones financieras y facilitan una comunicación más clara entre componentes del sistema Payrails, proporcionando así un entorno más coherente para el manejo de datos.
