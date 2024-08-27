@@ -171,3 +171,9 @@ Resumen de las actividades - 2024-08-27 21:07:18
    - Este cambio se realizó con el fin de asegurar que todas las entidades involucradas puedan acceder y utilizar esta información sin complicaciones, promoviendo así una mayor eficiencia en el flujo de datos y operaciones de transferencia entre diferentes sistemas.
 
 Estas acciones están diseñadas para mejorar la gestión y transmisión de datos en los procesos de pago y transferir, garantizando que todas las entidades puedan acceder a información relevante sin dificultades.
+Resumen de las actividades - 2024-08-27 21:21:07
+ Resumen de las actividades del día anterior:
+
+1. Se agregó una nueva columna llamada "interDestinationAccount" a la tabla "Transfer". Esta medida se tomó con el propósito de mantener la consistencia y facilitar la transmisión de datos entre la transferencia (Transfer) y la transacción (Transaction) en los sistemas relacionados, siguiendo el ejemplo proporcionado por el Payout.
+
+2. Se implementó un cambio para permitir que el campo "interDestinationAccount" se incluya al momento de crear un pago (Pay). Este ajuste fue realizado con la finalidad de asegurar una transmisión coherente y precisa de datos entre las distintas entidades relacionadas en los procesos de payrails.
