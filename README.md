@@ -177,3 +177,23 @@ Resumen de las actividades - 2024-08-27 21:21:07
 1. Se agregó una nueva columna llamada "interDestinationAccount" a la tabla "Transfer". Esta medida se tomó con el propósito de mantener la consistencia y facilitar la transmisión de datos entre la transferencia (Transfer) y la transacción (Transaction) en los sistemas relacionados, siguiendo el ejemplo proporcionado por el Payout.
 
 2. Se implementó un cambio para permitir que el campo "interDestinationAccount" se incluya al momento de crear un pago (Pay). Este ajuste fue realizado con la finalidad de asegurar una transmisión coherente y precisa de datos entre las distintas entidades relacionadas en los procesos de payrails.
+Resumen de las actividades - 2024-08-28 21:32:56
+ Durante el día anterior, se llevó a cabo una reunión con el equipo de desarrollo para discutir y mejorar el proceso de recepción del campo "interDestinationAccount" durante la creación de un pago. Este campo es crucial para asegurar que los pagos sean dirigidos al destinatario correcto, lo cual tiene implicaciones significativas en términos de seguridad y eficiencia operativa.
+
+**Objetivos de la Reunión:**
+1. **Identificar Problemas Actuales:** Se analizó detalladamente cómo los equipos actuales están recibiendo y manejando el campo "interDestinationAccount" en el proceso de creación del pago. Esto incluyó identificar áreas donde hayan fallas o insuficiencias.
+2. **Analizar Requisitos del Campo:** Se revisaron con cuidado los requisitos específicos para el campo "interDestinationAccount", asegurándose de que se cumplen todos los criterios necesarios para su correcto funcionamiento.
+3. **Mejorar Procesos y Seguridad:** Con base en las identificaciones realizadas, se discutió cómo implementar mejoras tanto en el frontend como en el backend del sistema para asegurar una recepción efectiva y segura de este campo.
+4. **Definir Acciones Siguientes:** Se establecieron acciones claras para seguir trabajando en la implementación de estas mejoras, incluyendo tareas específicas para los miembros del equipo y plazos de entrega definidos.
+
+**Resultados y Conclusiones:**
+- **Validación Aumentada:** Se acordó aumentar las validaciones tanto en la aplicación como en el servidor para asegurar que "interDestinationAccount" contenga información precisa y verificada antes de proceder con la creación del pago.
+- **Pruebas Estricas:** Se programaron pruebas más estrictas y diversificadas para validar la funcionalidad y seguridad del campo, tanto en condiciones normales como bajo escenarios potencialmente problemáticos.
+- **Retroalimentación al Cliente:** Se acordó proporcionar retroalimentación clara a los usuarios sobre los cambios implementados y cómo estos mejorarán su experiencia con el sistema de pagos.
+
+**Acciones Siguientes:**
+- Revisión detallada del código para implementación de las validaciones aumentadas.
+- Ejecución de pruebas automatizadas para asegurar la funcionalidad y seguridad de "interDestinationAccount".
+- Comunicación clara con el equipo de clientes sobre cambios en el proceso de creación de pagos.
+
+Este resumen refleja los avances realizados y las decisiones adoptadas durante la reunión del día anterior para mejorar el manejo del campo "interDestinationAccount" en la creación de pagos, asegurando una mayor precisión y seguridad en el sistema.
