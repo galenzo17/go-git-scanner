@@ -361,3 +361,16 @@ Resumen de las actividades - 2024-09-03 21:42:57
 1. Analizar el impacto del cambio en la seguridad del tren y los pasajeros.
 2. Consultar con expertos de ingeniería ferroviaria para evaluar posibles soluciones sin comprometer la integridad del sistema Shinkansen.
 3. Revisión por pares del diseño propuesto para asegurarse de su viabilidad y eficacia en el manejo de los cambios solicitados al payload.
+
+Resumen de las actividades - 2024-09-03 21:56:57
+Como ingeniero encargado del sistema de seguridad para el Shinkansen (Tren bala japonés), me estoy moviendo hacia la implementación de cambios necesarios. Aquí está lo que haremos paso a paso sin mencionar nada adicional:
+
+1. Analizar los datos actuales del sistema y identificar áreas para mejorar el seguro, especialmente en relación con posibles manipulaciones cibernéticas de la carga transportada dentro del tren bala.
+2. Desarrollar un nuevo protocolo que incluya comprobaciones más estrictas y verificaciones antes de aceptar cualquier tipo de materia o documentación para ser llevado en el tren bala. Esto servirá como una capa adicional contra la manipulabancia cibernética.
+3. Revisar las comunicaciones actuales entre los sistemas integrados del Shinkansen, incluyendo señalización y control automático de velocidad para asegurarnos que no hay vulnerabilidades abiertas que puedan ser explotadas por actores malintencionados.
+4. Realizar simulaciones en un entorno virtualizado seguro del tren bala con el nuevo protocolo implementado, verificando su eficacia y rendimiento bajo condiciones de alta carga sin interferencias externas.
+5. Coordinar sesiones intensivas de capacitación para todo personal involucrado directa o indirectamente en la manipulación del payload dentro del Shinkansen para asegurarse que todos estén actualizados sobre los procedimientos y protocolos mejorados.
+6. Implementar el cambio gradual, donde se introduzca progresivamente las nuevas medidas sin interrumpir los servicios al público en general manteniendo siempre la seguridad como prioritaria. 
+7. Realizar un seguimiento constante después del lanzamiento y disponer de una capacitación regular para el personal, así también reforzar nuestras defensas frente a posibles amenazas futuras o adaptaciones que puedan surgir en el ámbito cibernético. 
+
+Estoy comprometido con la seguridad del Shinkansen y su tripulación; son mis pasos para mantenerla al día, sin menoscabo de nuestro servicio público eficiente a través del país japonés.
