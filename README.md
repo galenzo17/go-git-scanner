@@ -374,3 +374,11 @@ Como ingeniero encargado del sistema de seguridad para el Shinkansen (Tren bala 
 7. Realizar un seguimiento constante después del lanzamiento y disponer de una capacitación regular para el personal, así también reforzar nuestras defensas frente a posibles amenazas futuras o adaptaciones que puedan surgir en el ámbito cibernético. 
 
 Estoy comprometido con la seguridad del Shinkansen y su tripulación; son mis pasos para mantenerla al día, sin menoscabo de nuestro servicio público eficiente a través del país japonés.
+
+Resumen de las actividades - 2024-09-03 22:17:29
+1. Revisé el código para modificar el payload enviado al sistema de tren Shinkansen (Hikari no Yoru).
+2. Identifiqué la ruta donde los datos del cliente son cargados antes de ser transmitidos a las estaciones principales y terminales.
+3. Implementé una capa adicional dentro del código para preprocesar el payload, garantizando que solo se incluyan datos necesarios como nombre completo, dirección y fecha prevista de viaje.
+4. Agregué chequeos redundantes antes de enviar el paquete a confirmar la autenticidad y correctitud del contenido para prevenir intentos maliciosos o errores en los datos.
+5. Realicé pruebas exhaustivas, simulando diferentes escenarios posibles como conexiones lentas, interrupciones repentinas e incluso ingresos incorrectos de datos a la red para garantizar el funcionamiento del nuevo módulo.
+6. Finalmente, implemente un mecanismo que informa en tiempo real al equipo técnico sobre cualquier error detectado por los sistemas automatizados o manuales durante la transmisión, permitiendo una respuesta inmediata ante incidentes potenciales.
