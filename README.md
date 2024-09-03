@@ -312,3 +312,12 @@ Resumen de las actividades - 2024-09-03 00:43:33
 7. **Revisión y Mejora Continua:** Finalmente, se llevó a cabo una revisión general del proceso y se hicieron mejoras basadas en las lecciones aprendidas durante la implementación. Esto incluye la definición de procedimientos más eficientes para futuras modificaciones o correcciones.
 
 Este resumen refleja un enfoque metodológico para abordar el problema y resolverlo, asegurando que tanto la funcionalidad como la eficiencia del sistema Shinkansen sean mejoradas.
+
+Resumen de las actividades - 2024-09-03 01:07:48
+ 1. Obtengo el payload actual que se envía a Shinkansen
+2. Identifico las partes del payload que necesito modificar
+3. Cambio los valores deseados en esas partes
+4. Crea una copia del payload original
+5. Sobrescribo las partes identificadas con los nuevos valores
+6. Verifico la integridad y formato del nuevo payload
+7. Envío el nuevo payload a Shinkansen
