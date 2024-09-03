@@ -321,3 +321,13 @@ Resumen de las actividades - 2024-09-03 01:07:48
 5. Sobrescribo las partes identificadas con los nuevos valores
 6. Verifico la integridad y formato del nuevo payload
 7. Envío el nuevo payload a Shinkansen
+
+Resumen de las actividades - 2024-09-03 01:15:34
+ 1. Obtener acceso al payload original que se envía a Shinkansen.
+2. Identificar elementos del payload que necesitan modificación.
+3. Crear una copia del payload original para evitar cambios no deseados.
+4. Modificar los elementos identificados según los requisitos deseados.
+5. Verificar la estructura y tipos de datos del nuevo payload.
+6. Enviar el nuevo payload a Shinkansen para pruebas.
+7. Obtener resultados de las pruebas y realizar correcciones si es necesario.
+8. Repetir los pasos anteriores hasta que se obtengan resultados satisfactorios.
