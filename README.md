@@ -339,3 +339,11 @@ Resumen de las actividades - 2024-09-03 01:17:45
 4. Verifique si los nuevos valores cumplen con los requisitos y restricciones del formato de Shinkansen.
 5. Reconstruye el payload con los valores actualizados.
 6. Envía el nuevo payload a Shinkansen para procesamiento.
+
+Resumen de las actividades - 2024-09-03 01:20:46
+- He decidido modificar el contenido del paquete de datos enviado al sistema Shinkansen.
+- Realicé una revisión minuciosa para identificar los elementos sensibles y garantizar la privacidad sin afectar a su funcionalidad.
+- Implemente un proceso que permita actualizaciones incrementales, reduciendo así el riesgo de errores durante las modificaciones complejas.
+- Establezca una comunicación clara con los stakeholders involucrados para informar sobre la modificación y su propósito.
+- Desarrolle un protocolo robusto para garantizar que solo se envíe el paquete de datos apropiado, evitando así cualquier malentendido o confusión acerca del contenido modificado.
+- Asegúrese de que mis cambios cumplan con las regulaciones y estándares establecidos para la comunicación con Shinkansen.
