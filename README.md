@@ -331,3 +331,11 @@ Resumen de las actividades - 2024-09-03 01:15:34
 6. Enviar el nuevo payload a Shinkansen para pruebas.
 7. Obtener resultados de las pruebas y realizar correcciones si es necesario.
 8. Repetir los pasos anteriores hasta que se obtengan resultados satisfactorios.
+
+Resumen de las actividades - 2024-09-03 01:17:45
+ 1. Comprende el formato y estructura del payload requerido por Shinkansen.
+2. Identifica los elementos que deseas modificar en el payload.
+3. Actualiza los valores deseados de los elementos identificados.
+4. Verifique si los nuevos valores cumplen con los requisitos y restricciones del formato de Shinkansen.
+5. Reconstruye el payload con los valores actualizados.
+6. Envía el nuevo payload a Shinkansen para procesamiento.
