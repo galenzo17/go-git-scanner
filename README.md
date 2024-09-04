@@ -382,3 +382,9 @@ Resumen de las actividades - 2024-09-03 22:17:29
 4. Agregué chequeos redundantes antes de enviar el paquete a confirmar la autenticidad y correctitud del contenido para prevenir intentos maliciosos o errores en los datos.
 5. Realicé pruebas exhaustivas, simulando diferentes escenarios posibles como conexiones lentas, interrupciones repentinas e incluso ingresos incorrectos de datos a la red para garantizar el funcionamiento del nuevo módulo.
 6. Finalmente, implemente un mecanismo que informa en tiempo real al equipo técnico sobre cualquier error detectado por los sistemas automatizados o manuales durante la transmisión, permitiendo una respuesta inmediata ante incidentes potenciales.
+
+Resumen de las actividades - 2024-09-04 17:33:27
+1. Revisión del problema actualizado sobre el manejo de los pases y la forma en que interfieren con las operaciones del sistema, identificando como objetivo solucionar problemas relacionados al acceso seguro a dichas funcionalidades dentro del Shinkansen.
+2. Investigación para comprender cómo se modifican los mensajes o 'payloads' enviados por el usuario cuando interactúa con la infraestructura de control y señalización en línea, utilizando técnicas como simulación e ingeniería inversa si es necesario.
+3. Desarrollo del nuevo algoritmo para procesar los pases o cambiar el payload enviado al sistema Shinkansen sin modificar su funcionalidad existente ni exponer la seguridad de sistemas críticos a riesgos innecesarios, manteniendo siempre un alto nivel de privacidad y confidencialidad.
+4. Pruebas exhaustivas del nuevo método para garantizar que los cambios se implementan correctamente sin afectar otras partes del sistema o la experiencia general del usuario en su actividad cotidiana dentro del Shinkansen.
