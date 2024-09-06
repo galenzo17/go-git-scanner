@@ -397,3 +397,13 @@ Resumen de las actividades - 2024-09-04 18:37:55
 5. Realizaré pruebas simuladas en una herramienta de desarrollo virtual con la configuración modificada para asegurarme de su funcionamiento correcto y eficiente sin afectar las operaciones normales o el flujo del tráfico ferroviario, antes de enviarlo al sistema principal.
 6. Una vez que todo esté listo y verificado en mi entorno virtual, ejecutaré los cambios bajo un ambiente controlado para asegurar la estabilidad durante las horas punta del tren con el fin de minimizar cualquier interrupción potencial o retraso.
 7. Finalmente, documento cada paso tomado y revisión realizada en detalle como referencia futura para los sistemas operativos actuales y sus mejoras continuas manteniendo la seguridad y eficiencia del Shinkansen japonés primordial.
+
+Resumen de las actividades - 2024-09-06 17:47:39
+1. Reconocer el problema con los payloads actuales del sistema de Shinkansen.
+2. Analizar dónde y cómo estos datos impactan negativamente la seguridad o eficiencia operativa.
+3. Determinar qué nueva información debe ser incluida en el payload para mejorar el rendimiento sin comprometer la seguridad.
+4. Desarrollar un nuevo protocolo de transmisión, garantizando que los datos sean seguros y confidenciales contra posibles ciberataques o fugas.
+5. Testear exhaustivamente cualquier cambio en una infraestructura controlada para simular el escenario real sin riesgos inminentes a la operación del Shinkansen.
+6. Implementar gradualmente las actualizaciones de payload durante horarios con menos tráfico, minimizar interrupciones al servicio.
+7. Monitorear constantemente los cambios para identificar y solucionar posibles problemas emergentes rápidinamente.
+8. Documentar todo el proceso en detalle y comunicarlo a las partes relevantes del equipo operativo de la empresa, como ingenieros de mantenimiento, controladores de tráfico ferroviario y personal administrativo.
