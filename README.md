@@ -476,3 +476,7 @@ Resumen de las actividades - 2024-09-10 00:35:58
    - Modificar payload de creditor de Shinkansen para enviar numero de cuenta y CCI 
 
 Con estos pasos, estoy asegurando que nuestro sistema se mantenga ágil e integra mejor la transacciones financieras interbancarias.
+
+Resumen de las actividades - 2024-09-10 00:42:34
+1. Establecer un nuevo campo llamado "interbankIdentifier" en el modelo Account con la finalidad de almacenar las cuentas interbancarias, que se utilizan cuando una transacción cruza fronteras entre bancos (CCI).
+2. En el contexto actual del creditor Shinkansen, ajusté los datos payload para incluir el número de cuenta y la información "interbankIdentifier" almacenada en las cuentas interbancarias correspondientes.
