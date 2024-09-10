@@ -467,3 +467,12 @@ Lista detallada paso por paso:
 - Paso 2: Integrar el CCI en mi crédito para los viajeros del Shinkansen, lo cual no solamente reflejará su número de cuenta sino también una identificación corporativa que ayudará a identificarlos más claramente y garantizar operaciones seguras.
 - Paso 3: Hacer la actualización en las aplicaciones relacionadas con mis cuentas interbancarias para incluir los nuevos campos agregados, lo cual permitirá acceder e interactuar fácilmente con mi información bancaria ampliada sin problemas.
 - Paso 4: Consultar y verificar que las transacciones a través de Shinkansen sean realizadas correctamente en base al nuevo CCI incorporado, garantizando la autenticidad del cliente corporativo para operaciones financieras elevadas.
+
+Resumen de las actividades - 2024-09-10 00:35:58
+1. Realizar un seguimiento del paisaje actualizado en mi empresa que requiere una mejor gestión de transacciones interbancarias a través de nuestro sistema Account.
+2. Concluir la necesidad urgente para agregar 'interbankIdentifier' como columna adicional al modelo Account, y estando consciente del impacto en el diseño actual, opté por mejorar estos sistemas desde cero sin añadir elementos redundantes:
+   - Agregar una columna en el modelo Account para guardar las cuentas interbancarias (interbankIdentifier)
+3. Determinar que modificar nuestro proceso de envío actualizado es imprescindible, y con un análisis detallado del flujo se decide cambiar la payola Creditor en Shinkansen para enviar el número de cuenta junto al CCI (Credit Card Information):
+   - Modificar payload de creditor de Shinkansen para enviar numero de cuenta y CCI 
+
+Con estos pasos, estoy asegurando que nuestro sistema se mantenga ágil e integra mejor la transacciones financieras interbancarias.
