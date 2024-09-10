@@ -480,3 +480,16 @@ Con estos pasos, estoy asegurando que nuestro sistema se mantenga ágil e integr
 Resumen de las actividades - 2024-09-10 00:42:34
 1. Establecer un nuevo campo llamado "interbankIdentifier" en el modelo Account con la finalidad de almacenar las cuentas interbancarias, que se utilizan cuando una transacción cruza fronteras entre bancos (CCI).
 2. En el contexto actual del creditor Shinkansen, ajusté los datos payload para incluir el número de cuenta y la información "interbankIdentifier" almacenada en las cuentas interbancarias correspondientes.
+
+Resumen de las actividades - 2024-09-10 01:08:53
+- Agregar una columna en el modelo Account para guardar las cuentas interbancarias (interbankIdentifier)
+  1. Añadir la nueva columna 'interbankIdentifier' al esquema del modelo Account y establecer su tipo de datos adecuado, como un identificador único que pueda representar diferentes entidades bancarias dentro o fuera de Japón.
+
+- Modificar payload de creditor de Shinkansen para enviar número de cuenta y CCI 
+   2. Actualizar el paquete del proveedor Shinkansen para incluir los detalles necesarios como números de cuentas relacionados con la banca interbancaria, junto con su Contrapartida Corporativa Internacional (CCI), en las comunicaciones financieras y transaccionales.
+
+Contexto: Para cumplir con el requisito del sistema japonés para un seguimiento más detallado de cuentas internacionales eficientes dentro del flujo crediticio entre bancos, es necesario que tanto la base de datos central 'Account' como los sistemas operativos intermedios incorporen estos cambios. Esto ayudará a mejorar el cumplimiento normativo y facilitará transacciones más rápidendo en las finanzas globales relacionadas con Shinkansen proyectos financiados por bancos extranjeros.
+
+Mi rol como desarrollador de software es asumir estas actualizaciones, trabajando junto a los expertos del departamento legal y contable para garantizar que todo siga siendo conforme a las regulaciones nacionales e internacionales pertinentes. Además, coordinaré con el equipo técnico responsable por la integración en nuestros sistemas informáticos existentes."
+
+Espero esta lista ayude a comprender los pasos necesarios para completar mis tareas y cómo se integran estas actualizaciones dentro del contexto de las finanzas globales relacionadas con Shinkansen.
