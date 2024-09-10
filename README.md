@@ -446,3 +446,14 @@ Resumen de las actividades - 2024-09-10 00:34:19
 3. Actualizar los paquetes de lógica en Shinkansen para enviar el número de cuenta y CCI (Custody Code Identifier) junto al pago cuando se realiza la transacción bancaria a través del sistema, como parte normalizado del envío de información financiera por parches regulares.
 4. Realizar pruebas exhaustivas en un entorno controlado para validar que los datos se guarden correctamente y que el procesamiento de las cuentas interbancarias funcione sin problemas, asegurando la integridad completa del sistema Shinkansen.
 5. Implementar estos cambios con transparencia al equipo interno y externo relevante para garantizar una adopción suave y evitar inconformidades en el uso cotidiano de los servicios bancarios por parte de mis clientes.
+
+Resumen de las actividades - 2024-09-10 00:35:35
+1. Evaluar si la columna `interbankIdentifier` es necesaria en el modelo Account, considerando que se está utilizando una tabla interbancária concreta (`InterBankAccounts`) para sugerir cuentas correspondientes y simplificar las transacciones entre sistemas.
+2. Si no existe la columna `interbankIdentifier` en el modelo Account, realizar los siguientes pasos:
+   a. Actualizar o modificar la estructura del esquema de la base de datos para agregar una nueva columma llamada 'interbankIdentifier' con un tipo numérico que pueda almacenar identificadores únicos (por ejemplo, `BIGINT`).
+   b. Implementar los cambios en el código fuente del esquema/modelo para asegurarse de que la columna ha sido creada y está disponible correctamente. 
+3. Una vez confirmado que la base de datos contiene la nueva columna `interbankIdentifier`, implementar un método o función en el código fuente del modelo Account, tal vez una procedimiento almacenado para asociar con precisión cada cuenta interbancaria a su respectiva entrada en el sistema.
+4. Modificar la lógica de envío y recepción de datos relacionados con los prestadores Shinkansen (por ejemplo, Creditors) para que manejen un nuevo parámetro 'interbankIdentifier' al enviar cuentas bancarias a través del servicio `ShinkansenCreditPaymentService`.
+5. Asegurarse de que el payload actualizado incluya los siguientes datos en la propuesta ahora: Numero_Clave_Bancaria (cc) y ClienteComercialIDInterbankIdentifier (CCI).
+6. Probar exhaustivamente las nuevas funcionalidades, verificando con pruebas unitarias que el sistema puede manejar correctamente los datos interbancarios y realizar ajustes según sea necesario para corregir problemas o mejoras sugeridas durante la prueba de fallos (Fault Injection Testing).
+7. Documentar todos los cambios realizados, incluyendo explicaciones detalladas sobre el motivo del cambio, cómo se implementó y resultados obtenidos después del análisis post-implementación para revisión futura o referencia por parte de otros desarrolladores.
