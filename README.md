@@ -457,3 +457,13 @@ Resumen de las actividades - 2024-09-10 00:35:35
 5. Asegurarse de que el payload actualizado incluya los siguientes datos en la propuesta ahora: Numero_Clave_Bancaria (cc) y ClienteComercialIDInterbankIdentifier (CCI).
 6. Probar exhaustivamente las nuevas funcionalidades, verificando con pruebas unitarias que el sistema puede manejar correctamente los datos interbancarios y realizar ajustes según sea necesario para corregir problemas o mejoras sugeridas durante la prueba de fallos (Fault Injection Testing).
 7. Documentar todos los cambios realizados, incluyendo explicaciones detalladas sobre el motivo del cambio, cómo se implementó y resultados obtenidos después del análisis post-implementación para revisión futura o referencia por parte de otros desarrolladores.
+
+Resumen de las actividades - 2024-09-10 00:35:53
+1. Actualizar mi base de datos con una nueva columna en el modelo Account llamada interbankIdentifier para almacenar las cuentas relacionadas con otras institucencias bancarias (interbancarias). Esta es necesaria ya que voy a realizar operaciones transaccionales cruzando la frontera bancaria.
+2. Actualizar el payload de mi crédito en Shinkansen para incluir, no solo un número de cuenta sino también su CCI (Corporate Customer Identifier), lo cual me ayudará a identificarlo mejor y facilitar operaciones seguras al mover fondos entre cuentas interbancarias.
+
+Lista detallada paso por paso:
+- Paso 1: Realizar la modificación en el modelo Account para agregar una nueva columna llamada 'interbankIdentifier'. Al hacerlo, me protegeré de futuras operaciones que involucren transacciones interbancarias. Esto es importante porque facilitará mantener un registro claro y organizado dentro de la base de datos.
+- Paso 2: Integrar el CCI en mi crédito para los viajeros del Shinkansen, lo cual no solamente reflejará su número de cuenta sino también una identificación corporativa que ayudará a identificarlos más claramente y garantizar operaciones seguras.
+- Paso 3: Hacer la actualización en las aplicaciones relacionadas con mis cuentas interbancarias para incluir los nuevos campos agregados, lo cual permitirá acceder e interactuar fácilmente con mi información bancaria ampliada sin problemas.
+- Paso 4: Consultar y verificar que las transacciones a través de Shinkansen sean realizadas correctamente en base al nuevo CCI incorporado, garantizando la autenticidad del cliente corporativo para operaciones financieras elevadas.
