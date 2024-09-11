@@ -516,3 +516,15 @@ Resumen de las actividades - 2024-09-11 21:59:07
 - Comprobar si ya existe un pago por autofondeo que está siendo procesado.
 - Abortar cualquier intento de generación nuevo una vez detectada la presencia de un pago actualmente en trámite.
 - Registrar este evento detenido para fines de auditoría y seguimiento. ✅
+
+Resumen de las actividades - 2024-09-11 21:59:30
+Primero reviso si ya hay un autofundeo en proceso mediante una consulta a la base de datos o al servicio correspondiente que gestiona nuestros pagos automáticos, esto es crucial para mantenernos dentro del límite establecido por las reglas financieras y evitar sanciones.
+
+Si no hay un autofundeo en proceso:
+- Iniciar el proceso de pago programado utilizando la función `start_auto_payout()`. 
+- Monitorear constantemente el estado del pago a través de una lógica de control que revise si se ha cambiador al término. Esto es para poder reaccionar rápidimientre y realizar acciones posteriores necesarias, como la generación de un informe o enviar alertas pertinentes.
+- Una vez el pago esté completo, documentar en los registros financieros que se ha terminado correctamente este autofundeo para mantener nuestro historial auditativo limpio y al día con la realidad del proceso implementado.
+
+Por otro lado:
+- Si hay un pago de autofondeo en curso, interrumpir el nuevo intento por crear uno más inmediatamente para no superponerlos y evitar complicaciones técnicas o financieras que esto podría causar.
+- Registrar este evento con detalles precisos dentro de los logs administrativos acorde al protocolo establecido, garantizando transparencia operativa e información clara en la auditoría posterior si fuera necesario.
