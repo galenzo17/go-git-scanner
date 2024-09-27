@@ -579,3 +579,12 @@ Cuando revisé los hooks del dashboard que estamos usando dentro de nuestra apli
 2. Diseño del wrapper para `invalidateQuery` con promesa incorporada.
 3. Implementación del método del nuevo wrapper dentro de nuestro flujo lógico.
 4. Corrección en todas las partes donde se usaba el operador void anteriormente, ahora utilizando los nuevos wrappers y manejando la espera asincrónica mediante promesas con `catch` para controlar errores adecuadamente.
+
+Resumen de las actividades - 2024-09-27 21:40:53
+1. Reuníme con mi equipo sobre los problemas que tenemos al utilizar 'void' en nuestros hooks del dashboard y cómo afecta a las operaciones asincrónicas, como invalidateQuery(). Decidimos necesitaba una solución para evitar esto.
+2. Propuse crear un wrapper de la función void que se usa actualmente con el objetivo de eliminar directamente llamadas al 'void' y promesas no esperadas por nosotros mismos, lo cual puede ser potencialmente peligroso en nuestras operaciones asincrónicas.
+3. Con la ayuda del equipo desarrollador, implementamos un wrapper que toma como argumento los parámetros necesarios y maneja adecuadamente las promesas para garantizar el correcto funcionamiento de nuestro dashboard sin esperar nada innecesariamente.
+4. Hice ajustes en nuestro código fuente para reemplazar llamadas directas al 'void' con estas nuevas implementaciones, que manejan adecuadamente las promesas y sus respuestas asincrónicas. También revisé el uso de invalidateQuery() y me aseguré de no esperar la promesa ni usar void en su lugar para mejorar nuestra experiencia del usuario final con menos tiempos inesperados en los dispositivos móviles pequeños donde este dashboard se está utilizando.
+5. Realicé pruebas exhaustivas y confirmé que el nuevo sistema es más robusto, seguro y rápido para ejecutar las operaciones asincrónicas necesarias dentro de nuestros hooks del dashboard en dispositivos móviles pequeños sin esperar nada innecesariamente.
+6. Actualicé la documentación técnica relacionada con los hooks y explicamos al equipo sobre cómo se manejan las promesas para evitar el uso de void, invalidateQuery() no esperado en nuestros dispositivos móviles pequeños donde este dashboard está siendo utilizado.
+7. Revisé mi código fuente una vez más para asegurarme que todas mis contribuciones son compatibles y coherentes con el resto del equipo, garantizando un funcionamiento sólido dentro de nuestro entorno como parte integrante del mismo sistema.
