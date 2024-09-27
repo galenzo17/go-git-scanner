@@ -556,3 +556,10 @@ Resumen de las actividades - 2024-09-27 01:05:43
 4. Reemplazar llamadas directas a funciones que usaban void por el nuevo wrapper desarrollado.
 5. Implementar uso del método `invalidateQuery` dentro de su propio bloque try/catch para manejar posibles errores en promesas y evitar esperar resultados inciertos. 
 6. Revisión final con equipo técnico antes de implementación definitiva.
+
+Resumen de las actividades - 2024-09-27 11:30:58
+1. Discutiría sobre los posibles problemas del uso actualizado `void` en los hooks del dashboard con mi equipo.
+2. Proponeríamos crear un wrapper alrededor de la función que actúa como intermediario para el llamado directo, esto evita el uso de 'void'.
+3. Adoptaría las recomendaciones y trabajaría en implementar dicho wrapper.
+4. Realizaría pruebas exhaustivas del nuevo comportamiento esperado con los hooks modificados.
+5. Incorporaría la práctica de utilización segura del `invalidateQuery` mediante el manejo adecuado de las promesas y sin depender directamente del uso 'void'.
