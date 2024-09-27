@@ -563,3 +563,11 @@ Resumen de las actividades - 2024-09-27 11:30:58
 3. Adoptaría las recomendaciones y trabajaría en implementar dicho wrapper.
 4. Realizaría pruebas exhaustivas del nuevo comportamiento esperado con los hooks modificados.
 5. Incorporaría la práctica de utilización segura del `invalidateQuery` mediante el manejo adecuado de las promesas y sin depender directamente del uso 'void'.
+
+Resumen de las actividades - 2024-09-27 20:43:06
+1. Reuníme con mi equipo.
+2. Comentamos sobre nuestros hooks actuales y notamos que estamos usando 'void' donde se esperaba una función de callback o manejar un error contryteado para la llamada al método invalidateQuery.
+3. Propuse revisar las prácticas recomendadas por MDN (Mozilla Developer Network) y otros recursos oficiales, e identificamos que debemos evitar el uso de 'void' en nuestros hooks del dashboard para mejorar la seguridad y robustez del código.
+4. Probé a implementar un wrapper alredstaticor una función personalizada encapsulando las operaciones asincrónicas, reemplazando el llamado directo por este nuevo enfoque. Esta modificación ayudaria a evitar la espera de promesas y mantener nuestro código más limpio y mantenible.
+5. Comencé un cambio gradual en mi equipo para usar 'invalidateQuery' con manejo adecuado de errores, por ejemplo usando el operador 'try-catch'. Esto nos permitiría reaccionar si algo falla durante la ejecución y poder tomar medidas correctivas sin esperar promesas.
+6. Trabajé en un plan para hacer estos cambios progresivos a lo largo de las próximas semanas, manteniendo una comunicación constante con mi equipo sobre los desafíos encontrados durante la transición y cómo mejorar nuestras prácticas.
