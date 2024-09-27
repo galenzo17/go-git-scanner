@@ -535,3 +535,8 @@ Resumen de las actividades - 2024-09-13 01:10:19
 3. Seleccionaré los puntos de datos relevantes y procederé a realizar modificaciones necesarias sin alterar otros aspectos relacionados con OCP que no sean esenciales, como personalizar el diseño o añadir filtros específicos para mejorar la visualización del resto de información.
 4. Si se requiere ocultar completamente ciertas columnas y restablecer los datos a un estado anterior donde dicha información no era visible, realizaré las acciones necesarias en el backend o utilizando funcionalidades específicas dentro de Grafana para redefinir la visibilidad del panel.
 5. Documentaré mis cambios paso a paso y mantendré un registro detallado que pueda ser revisado si es necesario, garantizando así una transparencia en los procedimientos seguidos durante el proceso de ofuscación sin comprometer la funcionalidad general del sistema.
+
+Resumen de las actividades - 2024-09-27 00:55:22
+1. Trabajo junto al equipo para crear un 'wrapper' para `invalidateQuery`.
+2. Reemplazo llamadas directas por este nuevo wrapper.
+3. Empleo del método con el operador `await` en lugar de esperar la promesa, agregando manejo de errores apreciado y al usuario final para no generar un comportamiento inconsistente o inesperado ni usar 'void'.
