@@ -548,3 +548,11 @@ Resumen de las actividades - 2024-09-27 00:59:04
 4. Desarrollé el código necesario, incluyendo una función que capturara cualquier error posible cuando se llama a `invalidateQuery`. Esto permitiría gestionar los errores proactivamente y evitar bloqueos o retrasos en la interfaz del usuario.
 5. Se probó el nuevo sistema con pequeñas pruebas para garantizar su eficiencia y correctitud sin afectar al rendimiento actual de nuestro dashboard.
 6. La integración completa se realizo, reemplazando los llamados directos a `invalidateQuery` por la nueva función wrapper que utilizaba 'await' con un bloque try/catch para capturar errores sin esperar promesas innecesarias.
+
+Resumen de las actividades - 2024-09-27 01:05:43
+1. Identificar hooks del dashboard que usan operador 'void'.
+2. Discutir posibles solucstaticiones con equipo técnico y gestorías de proyectos.
+3. Desarrollar un wrapper alrededor la función `invalidateQuery`.
+4. Reemplazar llamadas directas a funciones que usaban void por el nuevo wrapper desarrollado.
+5. Implementar uso del método `invalidateQuery` dentro de su propio bloque try/catch para manejar posibles errores en promesas y evitar esperar resultados inciertos. 
+6. Revisión final con equipo técnico antes de implementación definitiva.
