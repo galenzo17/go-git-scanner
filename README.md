@@ -540,3 +540,11 @@ Resumen de las actividades - 2024-09-27 00:55:22
 1. Trabajo junto al equipo para crear un 'wrapper' para `invalidateQuery`.
 2. Reemplazo llamadas directas por este nuevo wrapper.
 3. Empleo del método con el operador `await` en lugar de esperar la promesa, agregando manejo de errores apreciado y al usuario final para no generar un comportamiento inconsistente o inesperado ni usar 'void'.
+
+Resumen de las actividades - 2024-09-27 00:59:04
+1. Reuníme con mi equipo para discutir problemas en los hooks del dashboard relacionados al uso incorrecto de 'void'.
+2. Hicimos acordes que debía implementarse una función wrapper para el `invalidateQuery`. Esto ayudaria a gestionar las promesas y evitar la espera innecesaria.
+3. Elaboramos un plan detallado para crear esa funcionalidad adicional sin afectar al flujo de trabajo actual del dashboard.
+4. Desarrollé el código necesario, incluyendo una función que capturara cualquier error posible cuando se llama a `invalidateQuery`. Esto permitiría gestionar los errores proactivamente y evitar bloqueos o retrasos en la interfaz del usuario.
+5. Se probó el nuevo sistema con pequeñas pruebas para garantizar su eficiencia y correctitud sin afectar al rendimiento actual de nuestro dashboard.
+6. La integración completa se realizo, reemplazando los llamados directos a `invalidateQuery` por la nueva función wrapper que utilizaba 'await' con un bloque try/catch para capturar errores sin esperar promesas innecesarias.
