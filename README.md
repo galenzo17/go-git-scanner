@@ -571,3 +571,11 @@ Resumen de las actividades - 2024-09-27 20:43:06
 4. Probé a implementar un wrapper alredstaticor una función personalizada encapsulando las operaciones asincrónicas, reemplazando el llamado directo por este nuevo enfoque. Esta modificación ayudaria a evitar la espera de promesas y mantener nuestro código más limpio y mantenible.
 5. Comencé un cambio gradual en mi equipo para usar 'invalidateQuery' con manejo adecuado de errores, por ejemplo usando el operador 'try-catch'. Esto nos permitiría reaccionar si algo falla durante la ejecución y poder tomar medidas correctivas sin esperar promesas.
 6. Trabajé en un plan para hacer estos cambios progresivos a lo largo de las próximas semanas, manteniendo una comunicación constante con mi equipo sobre los desafíos encontrados durante la transición y cómo mejorar nuestras prácticas.
+
+Resumen de las actividades - 2024-09-27 21:40:20
+Cuando revisé los hooks del dashboard que estamos usando dentro de nuestra aplicación, encontré una práctica poco óptima. Había utilizado operadores 'void' en lugares donde se esperaba un resultado asincrónico desde el método `invalidateQuery`. Aprovechando la oportunidad para mejorar esto y alentado por mi equipo, hemos decidido tomar los siguientes pasos:
+
+1. Revisión inicial de hooks actuales que utilizan 'void'.
+2. Diseño del wrapper para `invalidateQuery` con promesa incorporada.
+3. Implementación del método del nuevo wrapper dentro de nuestro flujo lógico.
+4. Corrección en todas las partes donde se usaba el operador void anteriormente, ahora utilizando los nuevos wrappers y manejando la espera asincrónica mediante promesas con `catch` para controlar errores adecuadamente.
