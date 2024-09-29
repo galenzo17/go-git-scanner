@@ -615,3 +615,9 @@ Para mejorar la seguridad del dashboard y corregir el uso incorrecto del operado
 4. Crea un envoltorio (wrapper) que capture el resultado esperado o error posible al usar la promesa asociada con `invalidateQuery`. Asegúrate de manejar cualquier excepción y/o condición falsa dentro del wrapper para asegurar una respuesta adecuada.
 5. Implementa un sistema alternativo que utilice el método correcto, probablemente esperando la promesa sin emplear `void`, garantizando que se manejen los resultados de forma eficiente y segura con prácticas recomendadas para asincronía en JavaScript (promesas o async/await).
 6. En cada lugar donde solucionamos el uso incorrecto, revisa la documentación del dashboard pasándolo al equipo junto a un reporte detallado que explique las modificaciones realizadas y cómo estas mejoran la seguridad y rendimiento general de nuestro producto
+
+Resumen de las actividades - 2024-09-29 02:19:57
+1. Revisión personalizada del uso inadecuado del operador 'void' en los hooks del dashboard.
+2. Comunicarse y discutir sobre alternativas de mejor calidad, como el wrapper propuesto por mi equipo para la función invalidateQuery.
+3. Implementar cambios necesarios para reemplazar llamadas directas al void con nuestro nuevo enfoque utilizando funciones promesas cuando sea posible.
+4. Adoptar prácticas recomendadas, como no esperar a una respuesta de la función invalidateQuery y evitar el uso de 'void' para los hooks del dashboard donde se podrían manejar errores con un bloque try-catch.
