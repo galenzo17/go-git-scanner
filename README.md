@@ -605,3 +605,13 @@ Resumen de las actividades - 2024-09-29 00:41:07
 4. Asegurarme de que se utilice la función incorrecta para invocar el hook y corregir cualquier uso innecesario del void operador.
 5. Revisión final junto a mi equipo antes de subir los cambios al repositorio, verificando que todos los 'void' en los hooks estén eliminados y se haya implementado correctamente el wrapper para la función invalidateQuery con su manejo asincrónico adecuado.
 6. Submito un informe detallado de mis cambios a mi equipo supervisor, incluyendo todo código modificado y explicando por qué los reemplazamos 'void' por otro enfoque más robusto para el trabajo con promesas asincrónicas.
+
+Resumen de las actividades - 2024-09-29 01:24:54
+Para mejorar la seguridad del dashboard y corregir el uso incorrecto del operador 'void' en los hooks:
+
+1. Trabajo individualmente o junto al equipo de desarrollo para revisar todos los puntos donde se ha utilizado `void` con la función `invalidateQuery`.
+2. Identifica las posiciones críticas que impactan directamente el rendimiento y usuarios del dashboard, priorizando su actualización primero.
+3. Desmonta cualquier implementación existente de llamadas a `invalidateQuery()` seguida por una declaración void para eliminarlas completamente.
+4. Crea un envoltorio (wrapper) que capture el resultado esperado o error posible al usar la promesa asociada con `invalidateQuery`. Asegúrate de manejar cualquier excepción y/o condición falsa dentro del wrapper para asegurar una respuesta adecuada.
+5. Implementa un sistema alternativo que utilice el método correcto, probablemente esperando la promesa sin emplear `void`, garantizando que se manejen los resultados de forma eficiente y segura con prácticas recomendadas para asincronía en JavaScript (promesas o async/await).
+6. En cada lugar donde solucionamos el uso incorrecto, revisa la documentación del dashboard pasándolo al equipo junto a un reporte detallado que explique las modificaciones realizadas y cómo estas mejoran la seguridad y rendimiento general de nuestro producto
