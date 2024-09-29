@@ -597,3 +597,11 @@ Resumen de las actividades - 2024-09-29 00:39:23
 5. Determinamos utilizar `await` en lugar de esperar la promesa dentro del hook para evitar el bloqueo del hilo principal y permitir una mejor gestión asincrónica.
 6. Propuse implementar un manejo claro para los errores que podrían ocurrir durante las operaciones con `invalidateQuery`, utilizando estructuras de control adecuadas como 'try/catch'.
 7. Concluí discutiendo cómo esta modificación mejora la robustez y fiabilidad del sistema, así como su rendimiento general en tiempo real al evitar el bloqueo asincrónico innecesario y manejar las promesas de forma más eficiente.
+
+Resumen de las actividades - 2024-09-29 00:41:07
+1. Revisar código actual que usa 'void' en los hooks del dashboard para llamadas al invalidateQuery y otras funciones similares.
+2. Trabajar junto a mi equipo para diseñar un wrapper de la función invalidateQuery, el cual manejará las promesas asociadas sin usar void ni esperar sus resultados.
+3. Implementar los cambios en nuestro código, reemplazando todos los llamados directos al invalidateQuery con su nuevo wrapper.
+4. Asegurarme de que se utilice la función incorrecta para invocar el hook y corregir cualquier uso innecesario del void operador.
+5. Revisión final junto a mi equipo antes de subir los cambios al repositorio, verificando que todos los 'void' en los hooks estén eliminados y se haya implementado correctamente el wrapper para la función invalidateQuery con su manejo asincrónico adecuado.
+6. Submito un informe detallado de mis cambios a mi equipo supervisor, incluyendo todo código modificado y explicando por qué los reemplazamos 'void' por otro enfoque más robusto para el trabajo con promesas asincrónicas.
