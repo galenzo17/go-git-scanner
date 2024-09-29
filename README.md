@@ -588,3 +588,12 @@ Resumen de las actividades - 2024-09-27 21:40:53
 5. Realicé pruebas exhaustivas y confirmé que el nuevo sistema es más robusto, seguro y rápido para ejecutar las operaciones asincrónicas necesarias dentro de nuestros hooks del dashboard en dispositivos móviles pequeños sin esperar nada innecesariamente.
 6. Actualicé la documentación técnica relacionada con los hooks y explicamos al equipo sobre cómo se manejan las promesas para evitar el uso de void, invalidateQuery() no esperado en nuestros dispositivos móviles pequeños donde este dashboard está siendo utilizado.
 7. Revisé mi código fuente una vez más para asegurarme que todas mis contribuciones son compatibles y coherentes con el resto del equipo, garantizando un funcionamiento sólido dentro de nuestro entorno como parte integrante del mismo sistema.
+
+Resumen de las actividades - 2024-09-29 00:39:23
+1. Revisé los hooks del dashboard actuales que usaban 'void'.
+2. Discutí con mi equipo nuestra preocupación por las posibles fallas y sobrecarga de llamadas en el backend al esperar la promesa desde `invalidateQuery`.
+3. Propuse crear un wrapper para encapsular estas operaciones, facilitando así su manejo adecuado.
+4. Proyecté que este wrapper podría incluir lógica condicional y llamadas secundarias si es necesario.
+5. Determinamos utilizar `await` en lugar de esperar la promesa dentro del hook para evitar el bloqueo del hilo principal y permitir una mejor gestión asincrónica.
+6. Propuse implementar un manejo claro para los errores que podrían ocurrir durante las operaciones con `invalidateQuery`, utilizando estructuras de control adecuadas como 'try/catch'.
+7. Concluí discutiendo cómo esta modificación mejora la robustez y fiabilidad del sistema, así como su rendimiento general en tiempo real al evitar el bloqueo asincrónico innecesario y manejar las promesas de forma más eficiente.
