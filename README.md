@@ -631,3 +631,16 @@ Como trabajo en revisión del código relacionado con los hooks del dashboard:
 5. La integramos en nuestros hooks del dashboard, aplicando la práctica que recomendaba no usar 'void' para asegurarnos que estemos aprovechando las capacidades asincrónicas y seguras de JavaScript adecuadamente cuando interactuamos con el backend.
 6. Después se realizó un conjunto exhaustivo de pruebas unitarias e integradas en la infraestructura del dashboard para confirmar que nuestro wrapper funcionaba correctamente sin esperar promesas, manejando los errores apropiadamente y garantizando una experiencia fluida para el usuario final.
 7. Finalmente, se documentó cómo usar este nuevo enfoque dentro de la base de código del proyecto, asegurándonos que cualquier persona trabajando con nuestros hooks esté al tanto de su funcionalidad y los nuevos procedimientos correctivos para futuras actualizaciones o mantenimiento.
+
+Resumen de las actividades - 2024-09-30 13:30:36
+Como parte del esfuerzo de optimización en nuestro equipo, hemos abordado el uso incorrecto del operador 'void' en los hooks del dashboard. Aquí está cómo procedemos:
+
+1. Reconocer que la función "invalidateQuery" no devuelve nada y por lo tanto suponía un error usar void para sus llamadas desde los hooks.
+2. Con el equipo, discutimos las implicancias de esperar una promesa con 'void' en nuestro flujo del trabajo diario sin obtener resultados necesarios.
+3. Se propone la creación de un wrapper alredenzo que encapsule la llamada a "invalidateQuery" y gestione adecuadamente sus asociaciones comoy reemplazar las llamadas directas por este nuevo enfoque, para evitar esperar una promesa inútil.
+4. Comenzamos el desarrollo de un wrapper con los siguientes pasos:
+    a. Diseñar la interfaz del wrapper que recibirá como parámetro la función "invalidateQuery".
+    b. Implementar funcionalidades dentro del wrapper para manejar cualquier posible error sin esperar una promesa, utilizando bloques try/catch adecuadamente.
+5. Tras el diseño y desarrollo, revisamos con detenimiento que nuestro nuevo enfoque se ajusta correctamente al código existente. Implementamos cambios mientras seguimos manteniendo la integridad del sistema.
+6. Conforme estamos trabajando dentro de un ambiente donde todos los miembros están comprometidos y entendemos el motivo detrás del cambio, nos reafirmamos en nuestro objetivo: optimizar para que "invalidateQuery" sea accedido sin esperar una promesa vacía.
+7. Finalmente, publicamos las modificaciones implementadas con documentación clara sobre los cambios realizados y sus beneficios para la eficiencia del equipo.
