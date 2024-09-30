@@ -692,3 +692,18 @@ Resumen de las actividades - 2024-09-30 18:34:03
 3. Aunque nuestro objetivo es evitar esperar promesas innecesarias y no usar operadores void donde sea incorrecto, necesitamos implementar un manejo adecuado de las promesas para garantizar la seguridad y funcionalidad del dashboard cuando se invalidan consultas.
 4. Para el mismo propósito, también consideramos que debemos utilizar 'invalidateQuery' con una estructura condicional robusta basada en bloques try-catch o similares de manejo para las posibles excepciones relacionadas al asociarse a promesas y su resolución.
 5. Finalmente, hemos decidido reemplazar todos los llamados directos 'void' por nuestras implementaciones mejoradas que utilizan la seguridad de promesas junto con el manejo adecuado de excepciones para evitar esperar una respuesta innecesariamente y garantizar un comportamiento robusto en nuestro dashboard.
+
+Resumen de las actividades - 2024-09-30 18:51:00
+1. Revisión del uso actual del operador 'void' en los hooks del dashboard: He notado que estamos utilizando void donde se podría emplear una función que devuelva resultados relevantes, especialmente dentro de nuestros hooks. Esto es problemático porque impide la implementación eficiente y segura de las promesas necesarias para mantener el estado del dashboard actualizado en tiempo real sin esperar inadvertidamente durante demasiado tiempo o utilizando void, lo cual puede llevar a bloqueos.
+
+2. Diagnóstico con mi equipo: Después de discutir este asunto con mis colegas, entendemos que nuestra dependencia en el operador 'void' ha sido una elección inconsciente dada por la falta de conocimiento sobre manejo adecuado de promesas y async/await.
+
+3. Implementación del wrapper para invalidateQuery: Desarrollé un componente react que actúa como un "wrapper" o "envoltorio", el cual captura cualquier error relacionado con la ejecución fallida del método 'invalidateQuery' y maneja adecuadamente estos eventuales rechazos de promesa para evitar bloqueos en nuestro sistema.
+
+4. Reemplazo directo por el wrapper: Cada vez que actualizamos los hooks, ya no llamaremos al método 'invalidateQuery' directamente como antes usábamos void; en su lugar, pasamos a través del nuevo componente react "wrapper" que maneja la promesa y sus posibles errores.
+
+5. Uso consciente de invalidateQuery con un catch: He revisado nuestro código para garantizar que siempre utilicemos el método 'invalidateQuery' dentro de una declarastración try-catch, esto no solo protege contra bloqueos sino también mejora la visibilidad y manejo en caso de errores.
+
+6. Revisión continua: Sé consciente que este es un proceso continuo; por lo tanto, estoy comprometido a revisar periódicamente nuestro código para mantener una buena práctica siempre utilizando promesas y manejando operaciones asincrónicas con los nuevos métodos adecuados.
+
+7. Comunicar cambios al equipo: He informado sobre estos desarrollos a mis colegas en busca de su retroalimentación, lo que nos permite mejorar juntos la calidad del código y el mantenimiento general del sistema de dashboard.
