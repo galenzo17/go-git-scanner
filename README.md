@@ -685,3 +685,10 @@ Resumen de las actividades - 2024-09-30 15:54:25
 2. Desarrollo e implemente un wrapper alrededor de la función `invalidateQuery`, que maneja las promesas adecuadamente.
 3. Reemplace todos los llamados directos a `void` por el nuevo wrapper en mi código, especialmente dentro del dashboard hooks.
 4. Integre un bloque try-catch para cada invocación de la función `invalidateQuery`, evitando esperar las promesas y manejando posibles errores con precisión. ✅👍
+
+Resumen de las actividades - 2024-09-30 18:34:03
+1. Colaboré con mi equipo sobre los problemas relacionados al uso del operador 'void' en nuestros hooks del dashboard actuales.
+2. Trabajamos juntos a desarrollar un wrapper que rodeara el llamado directo de la función utilizada para invalidar las consultas, reemplazando así el anterior uso inseguro y poco eficiente 'void'.
+3. Aunque nuestro objetivo es evitar esperar promesas innecesarias y no usar operadores void donde sea incorrecto, necesitamos implementar un manejo adecuado de las promesas para garantizar la seguridad y funcionalidad del dashboard cuando se invalidan consultas.
+4. Para el mismo propósito, también consideramos que debemos utilizar 'invalidateQuery' con una estructura condicional robusta basada en bloques try-catch o similares de manejo para las posibles excepciones relacionadas al asociarse a promesas y su resolución.
+5. Finalmente, hemos decidido reemplazar todos los llamados directos 'void' por nuestras implementaciones mejoradas que utilizan la seguridad de promesas junto con el manejo adecuado de excepciones para evitar esperar una respuesta innecesariamente y garantizar un comportamiento robusto en nuestro dashboard.
