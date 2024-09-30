@@ -679,3 +679,9 @@ Primero que todo, noté cómo utilizamos 'void' en los hooks del dashboard cuand
 
 8. Seguimiento continuo:
    - Trabajaremos en asegurar que este cambio siga siendo relevante conforme evolucione la tecnología o las necesidades específicas del proyecto, revisando periódicamente su funcionamiento y eficiencia para realizar los ajustes pertinentes.
+
+Resumen de las actividades - 2024-09-30 15:54:25
+1. Discute con mi equipo sobre el uso del operador 'void' en los hooks del dashboard y su impacto negativo.
+2. Desarrollo e implemente un wrapper alrededor de la función `invalidateQuery`, que maneja las promesas adecuadamente.
+3. Reemplace todos los llamados directos a `void` por el nuevo wrapper en mi código, especialmente dentro del dashboard hooks.
+4. Integre un bloque try-catch para cada invocación de la función `invalidateQuery`, evitando esperar las promesas y manejando posibles errores con precisión. ✅👍
