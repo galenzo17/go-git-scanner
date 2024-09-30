@@ -652,3 +652,30 @@ Resumen de las actividades - 2024-09-30 13:31:28
 4. Revisé meticulosamente todos los lugares donde originalmente se había usado `void` para la promesa del `invalidateQuery`. Lo reemplacé con referencias al nuevo wrapper personalizado, asegurándome de que el código utilizara este último en lugar de esperar resultados directamente.
 5. Integré los cambios sugeridos por mi equipo y revisé minuciosamente para verificar cualquier posible efecto secundario no deseado del nuevo wrapper o la eliminación del uso inadecuado de `void`. Encontré e implementé corrección en un par que inicialmente falló porque se refería a una variable fuera del alcance actual.
 6. Finalmente, confirmé con mi equipo y otros desarrolladores el funcionamiento correcto de nuestros hooks después de la eliminación inmediata del uso no deseado de `void` en los llamados al `invalidateQuery`. Agradecí a mis colegas por su ayuda e insistieron que continuemos verificando y mejorando las prácticas.
+
+Resumen de las actividades - 2024-09-30 15:02:44
+Primero que todo, noté cómo utilizamos 'void' en los hooks del dashboard cuando llaman al `invalidateQuery`. Durante una reunión con nuestro equipo de desarrollo, discutimos el mejor curso de acción. Aquí está la lista detallada paso a paso:
+
+1. Identificación del problema:
+   - Reconocemos que utilizamos 'void' en llamadas al `invalidateQuery` y eso causa ineficiencias porque esperamos su resultado, lo cual no debería ser necesario para nuestro flujo de trabajo actual.
+   
+2. Propuesta del equipo:
+   - Desarrollaremos un wrapper personalizado para la función `invalidateQuery`. Este controlador manejará las promesas internamente y nos permitirá interactuar con ella sin tener que esperar el resultado, asegurando una mayor eficiencia en nuestro desarrollo.
+   
+3. Implementación del wrapper:
+   - Creé un nuevo archivo llamado `invalidateQueryWrapper.js`. Dentro de este código, encapsulo la función original para manejar y responder las promesas sin utilizar 'void'.
+   
+4. Cambio en el hooks del dashboard:
+   - Actualicé los hooks que antes usaban directamente `invalidateQuery` a invocar nuestro nuevo wrapper, evitando así cualquier uso de void y la espera innecesaria por promesas resueltas.
+   
+5. Técnica alternativa para el manejo de errores:
+   - Remplace 'void' con un bloque `try...catch` que captura los posibles errores al llamar a nuestro nuevo wrapper y permite una gestión efectiva del mismo, manteniendo la respuesta no blockante.
+   
+6. Pruebas exhaustivas:
+   - Realice pruebas para validar el correcto funcionamiento de las promesas manejadas por nuestro wrapper sin esperar a su resolución y que este cumpla con todas sus funcionalidades previstas, incluyendo la gestión adecuada de errores.
+   
+7. Revisión en equipo:
+   - Con un grupo pequeño pero representativo del equipo, revisemos el nuevo código implementado para confirmar su correcta integración y eficiencia al desvincularse 'void' de nuestros hooks del dashboard.
+
+8. Seguimiento continuo:
+   - Trabajaremos en asegurar que este cambio siga siendo relevante conforme evolucione la tecnología o las necesidades específicas del proyecto, revisando periódicamente su funcionamiento y eficiencia para realizar los ajustes pertinentes.
