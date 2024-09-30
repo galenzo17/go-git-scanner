@@ -621,3 +621,13 @@ Resumen de las actividades - 2024-09-29 02:19:57
 2. Comunicarse y discutir sobre alternativas de mejor calidad, como el wrapper propuesto por mi equipo para la función invalidateQuery.
 3. Implementar cambios necesarios para reemplazar llamadas directas al void con nuestro nuevo enfoque utilizando funciones promesas cuando sea posible.
 4. Adoptar prácticas recomendadas, como no esperar a una respuesta de la función invalidateQuery y evitar el uso de 'void' para los hooks del dashboard donde se podrían manejar errores con un bloque try-catch.
+
+Resumen de las actividades - 2024-09-30 01:27:53
+Como trabajo en revisión del código relacionado con los hooks del dashboard:
+1. Identifiqué que actualmente se está utilizando 'void' en lugar de una función adecuada dentro de algunos hooks cuando intentamos invocar `invalidateQuery`.
+2. Con el equipo, discutimos la posibilidad y viabilidad de crear un wrapper alrededor del método original que usa 'void'.
+3. Dentro de este proceso se diseñó e implementó una función envoltorio para `invalidateQuery`, proporcionando manejo adecuado de promesas y evitando el uso directo de funciones void.
+4. Revisamos las partes críticas del código, donde 'void' fue reemplazado por la nueva implementación que utiliza corchetes `[]` para indicar una función asincrónica sin necesidad de esperar su resultado o manejar el caso de error con un bloque try-catch.
+5. La integramos en nuestros hooks del dashboard, aplicando la práctica que recomendaba no usar 'void' para asegurarnos que estemos aprovechando las capacidades asincrónicas y seguras de JavaScript adecuadamente cuando interactuamos con el backend.
+6. Después se realizó un conjunto exhaustivo de pruebas unitarias e integradas en la infraestructura del dashboard para confirmar que nuestro wrapper funcionaba correctamente sin esperar promesas, manejando los errores apropiadamente y garantizando una experiencia fluida para el usuario final.
+7. Finalmente, se documentó cómo usar este nuevo enfoque dentro de la base de código del proyecto, asegurándonos que cualquier persona trabajando con nuestros hooks esté al tanto de su funcionalidad y los nuevos procedimientos correctivos para futuras actualizaciones o mantenimiento.
