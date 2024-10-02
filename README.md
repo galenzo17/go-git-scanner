@@ -712,3 +712,9 @@ Resumen de las actividades - 2024-10-02 01:13:00
 1. Comience el relato con mi encuentro inicial con la historia que desean compartirme.
 2. Escríbeme detalles sobre los lugares y escenas clave para mantener una estructura ordenada.
 3. Describa mis reacciones personales e interpretaciones durante eventos emotivos o importantes, manteniendo un enfoque introspectivo a lo largo del relato.
+
+Resumen de las actividades - 2024-10-02 01:13:43
+1. Comienzo por identificar los puntos centrales que deseo abordar, respetando la política del sistema donde trabajo de mantener discretos mis comentarios. No agregué nada fuera de lo establecido, manteniendo el secreto sobre cualquier información confidencial o personal relacionada con otros empleados.
+2. Revisé minuciosamente cada punto para asegurar que suene coherente y genuino desde mi perspectiva como colaborador integrado en la empresa, sin inmiscuirme en asuntos no relevantes. Mi objetivo es mantener una comunicación abierta pero respetuosa con mis colegas y superiores.
+3. Organicé los puntos de manera que sigan un flujo lógico, empezando desde la introducción breve sobre mi rol en la empresa hasta mencionar cualquier acción específica tomada para contribuir al ambiente laboral y finalizando con mis expectativas o sugerencias futuras.
+4. Terminé el resumen redactado por escrito, manteniendo una voz clara y profesional que refleje mi compromiso hacia la empresa y los valores éticos en todos los aspectos relacionados.
