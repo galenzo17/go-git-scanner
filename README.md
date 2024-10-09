@@ -741,3 +741,13 @@ Resumen de las actividades - 2024-10-09 22:29:02
 4. Encontré un error relacionado con cómo se filtraban los datos al compararlos contra una base de información actualizada, lo que resultaba en bancos no mapeados incorrectamente apareciendo o faltando del dashboard.
 5. Corregí el filtro utilizando las reglas adecuadas y aseguré que la fuente se actualizara diariamente para reflejar cualquier cambio realista. 
 6. Reinicié el servidor de manera controlada, esperando un informe claro del dashboard en cuanto al estado correcto de los bancos mapeados sin errores visuales o funcionales.
+
+Resumen de las actividades - 2024-10-09 23:49:18
+Primero me di cuenta que había algunos bancos no mapeados en nuestro dashboard. Para solucionar esto, seguí estos pasos de manera ordenada:
+
+1. Identifiqué los nombres y números de teléfono asociados a los bancos no mapeados para verificar si se trataba de institucries locales o externas.
+2. Revisé nuestra base de datos actualizadas en busca de información relevante sobre esas entidades financieras, como el estado fiscal y su dirección postal.
+3. Para obtener la ubicación exacta de los bancos no mapeados que eran locales, consulté un mapa digitalizado del área para encontrar sus coordenadas geográficas utilizando herramientas GIS disponibles en línea.
+4. Actualicé el panel 'Cuenta' o similar dentro del dashboard con los bancos correctamente mapeados asegurándome de que las direcciones estén registradas y se puedan encontrar mediante una búsqueda rápida.
+5. Para aquellos no locales, realizé la comprobación telefónica para confirmar su información correspondiente con base en los datos disponibles como estado fiscal o nombre oficial de la institución financiera. 
+6. Actualicé el dashboard final con las ubicaciones correctas y se aseguró que toda esa información estuviera precisa, actualizada y mapeada adecuadamente para facilitar su acceso e identificación por parte del cliente o equipo analítico de nuestro banco.
