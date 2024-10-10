@@ -763,3 +763,14 @@ Resumen de las actividades - 2024-10-10 21:42:18
 1. Revisar la funcionalidad del mapeador para identificar por qué está fallando y corregir cualquier error encontrado.
 2. Actualizar las referencias geográfdependentientes a los bancos correctos dentro de nuestro sistema, si es necesario hacerlo debido al cambio en el mapeo actualizado o cambios estructurales del dashboard que requieran una remapeo posterior.
 3. Realizar pruebas exhaustivas para confirmar que la solución implementada resuelve efectivamente los problemas de no mapeo y garantiza un rendimiento eficiente en el dashboard.
+
+Resumen de las actividades - 2024-10-10 22:10:01
+1. Asegurar un secreto almacenado para WebhookEndpoint, cada registro genera secret aleatorio y se guarda encriptado:
+   - Genero o solicito los datos sensibles como parte de mis requisitos de seguridad del sistema web.
+   - Cada vez que el sistema recibe una entrada válida concreta para WebhookEndpoint, asigno un secreto aleatorio único a ella y la encripto utilizando algoritmos confiables de cifrado.
+   - El archivo o base de datos del backend mantiene estos secretos clave almacenados seguro mediante técnstaticmeasures como protección contra acceso no autorizado, con infraestructura fuertemente segura. 
+
+2. Bancos no mapeados en el dashboard:
+   - Observé que ciertas entidades o tablas de mi base de datos no están presentes ni representadas correctamente dentro del controlador central para la visualización (el dashboard).
+   - Identifiqué un error con uno de los componentes mapeadores, específicamente relacionado a cómo se vinculan las entidades en el sistema. 
+   - Contacte al departamento técnico o equipo relevante inmediatamente para reportar y resolver este problema antes de que afecte la experiencia del usuario final e interfaz con nuestros datos clave.
