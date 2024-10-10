@@ -774,3 +774,18 @@ Resumen de las actividades - 2024-10-10 22:10:01
    - Observé que ciertas entidades o tablas de mi base de datos no están presentes ni representadas correctamente dentro del controlador central para la visualización (el dashboard).
    - Identifiqué un error con uno de los componentes mapeadores, específicamente relacionado a cómo se vinculan las entidades en el sistema. 
    - Contacte al departamento técnico o equipo relevante inmediatamente para reportar y resolver este problema antes de que afecte la experiencia del usuario final e interfaz con nuestros datos clave.
+
+Resumen de las actividades - 2024-10-10 23:32:37
+Resumen del estado actual:
+- Aseguramiento de claves criptográfmiamente seguras para WebhookEndpoint.
+- Fallo al generar secretos aleatorios e inyectarlos a un endpoint web, es decir, la emisión de datos no está protegida contra accesos maliciosos y los registros pueden ser comprometidos sin el conocimiento del equipo administrativo. Además, este problema impide que se almacenen estos secretos encriptados para su posterior uso seguro por parte de otros sistemas o procesos dentro de nuestra infraestructura tecnológica actual.
+- Presencia de entidades no mapeadas (Entities not mapped) detectada en el Dashboard, que indican un problema con algún mapa del sistema y potencialmente afectarían la interpretación correcta o acceso a los datos dentro del dashboard. Este error hace que ciertas partes de nuestro informe sean incorrectas e incluso podrían llevar al mal uso o pérdida cruzada de información relevante para las decisiones operacionales importantes tomadas por la dirección administrativa en el momento adecuado.
+
+Parte del proceso completo paso a paso: 
+1) Identificar y reconocer que cada registro debe generarse con una clave secreta aleatoria antes de ser enviada al endpoint web para su protección contra accesos no autorizados o maliciosos. Actualizar protocolos para la creación de secretos basándose en estándares criptográficos reconocidos por el sector y garantizar que estos sean generados con precisión aleatoria sin repetición, evitando así los riesgos asociados a la predicción o manipulación.
+2) Desarrollar procedimientos para almacenar e inyectar en tiempo real dichas claves criptográficamente seguras generadas dentro del sistema antes de que se envíe el registro, con un mecanismo robusto y confiable hacia WebhookEndpoint sin interrupciones o pérdidas.
+3) Corregir la falta en las configuraciones actuales para asegurar correctamente los mapeos del Dashboard; revisar patrones de consulta, estructuración de datos e implementación adecuada que permita una visualización y navegación precisa sin distorsión o omisión. Realizar pruebas exhaustivas después de las correciones para garantizar la integridad completa en el procesamiento del Dashboard y su interpretación fidedigna por parte de los administradores finales.
+4) Documentar, hacer cumplir e implementar estas mejoras como una práctica estándar dentro del equipo para prevenir futuras repeticiones o errores similares en la generación de secretos seguramente y el mapeo adecuado del Dashboard.
+
+Referencias: 
+- [WebhookSecure Handling](https://www.examplelinktoprotocolforsecrethandling) (Ejemplo - Revisar un protocolo para manejar encriptaciones con seguridad webhooks).
